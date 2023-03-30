@@ -174,7 +174,6 @@ source "qemu" "custom_image" {
   ssh_password     = "ubuntu"
   ssh_username     = "ubuntu"
   ssh_timeout      = "10m" # can be slow on CI
-  shutdown_command = "sudo poweroff"
 
   headless         = true  # false # to see the process, In CI systems set to true
   accelerator      = "kvm" # set to none if no kvm installed
