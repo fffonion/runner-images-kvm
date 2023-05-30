@@ -447,6 +447,7 @@ build {
     remote_folder   = "/tmp"
     inline = [
       "/usr/bin/apt-get clean",
+      "echo 'kernel.panic = 10' >> /etc/sysctl.conf",
       "rm -rf /etc/apparmor.d/cache/* /etc/apparmor.d/cache/.features /etc/netplan/50-cloud-init.yaml /etc/ssh/ssh_host* /etc/sudoers.d/90-cloud-init-users",
       "/usr/bin/truncate --size 0 /etc/machine-id",
       "/usr/bin/gawk -i inplace '/PasswordAuthentication/ { gsub(/yes/, \"no\") }; { print }' /etc/ssh/sshd_config",
