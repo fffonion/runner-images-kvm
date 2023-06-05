@@ -186,7 +186,7 @@ variable "vm_template_name" {
 
 variable "ubuntu_iso_file" {
   type    = string
-  default = "ubuntu-22.04.1-live-server-amd64.iso"
+  default = "ubuntu-22.04.1-live-server-arm64.iso"
 }
 
 source "qemu" "custom_image" {
@@ -194,15 +194,19 @@ source "qemu" "custom_image" {
   http_directory = "cloud-init"
   #iso_url        = "https://releases.ubuntu.com/22.04.1/${var.ubuntu_iso_file}"
   #iso_checksum   = "file:https://releases.ubuntu.com/22.04.1/SHA256SUMS"
-  iso_url      = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-disk-kvm.img"
+  iso_url      = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-arm64.img"
   iso_checksum = "file:https://cloud-images.ubuntu.com/jammy/current/SHA256SUMS"
   disk_image   = true
 
 
+ qemu_binary =  "qemu-system-aarch64"
+ machine_type = "virt"
+ cpus = 4
+cpu_model = "host"
+
   qemuargs = [
-    ["-smbios",
-      "type=1,serial=ds=nocloud-net;instance-id=packer;seedfrom=http://{{ .HTTPIP }}:{{ .HTTPPort }}/",
-    ]
+    ["-drive", "if=none,id=cloud,file=cloud-init/cloud.img"],
+    ["-drive", "file=output-custom_image/ubuntu-22.04,if=virtio,cache=writeback,discard=ignore,format=qcow2"],
   ]
 
   ssh_password = "ubuntu"
@@ -214,7 +218,6 @@ source "qemu" "custom_image" {
   format           = "qcow2"
   memory           = 4096
   disk_size        = "86G"
-  cpus             = 16
   disk_compression = true
   disk_interface   = "virtio"
   # net_device       = "virtio-net"
