@@ -205,8 +205,11 @@ source "qemu" "custom_image" {
 cpu_model = "host"
 
   qemuargs = [
-    ["-drive", "if=none,id=cloud,file=cloud-init/cloud.img"],
-    ["-drive", "file=output-custom_image/ubuntu-22.04,if=virtio,cache=writeback,discard=ignore,format=qcow2"],
+    ["-smbios",
+      "type=1,serial=ds=nocloud-net;instance-id=packer;seedfrom=http://{{ .HTTPIP }}:{{ .HTTPPort }}/",
+    ],
+    ["-pflash", "/usr/share/AAVMF/AAVMF_CODE.fd"],
+    ["-pflash", "/home/admin/flash1.img"],
   ]
 
   ssh_password = "ubuntu"
