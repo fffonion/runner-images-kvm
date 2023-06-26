@@ -194,7 +194,7 @@ source "qemu" "custom_image" {
   http_directory = "cloud-init"
   #iso_url        = "https://releases.ubuntu.com/22.04.1/${var.ubuntu_iso_file}"
   #iso_checksum   = "file:https://releases.ubuntu.com/22.04.1/SHA256SUMS"
-  iso_url      = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64-disk-kvm.img"
+  iso_url      = "https://cloud-images.ubuntu.com/jammy/current/jammy-server-cloudimg-amd64.img"
   iso_checksum = "file:https://cloud-images.ubuntu.com/jammy/current/SHA256SUMS"
   disk_image   = true
 
