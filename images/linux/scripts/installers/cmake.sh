@@ -14,11 +14,11 @@ if command -v cmake; then
     echo "cmake is already installed"
 else
 	# Download script to install CMake
-	download_url=$(get_github_package_download_url "Kitware/CMake" "endswith(\"inux-x86_64.sh\")")
+	download_url=$(get_github_package_download_url "Kitware/CMake" "endswith(\"inux-$ARCH_L.sh\")")
 	curl -fsSL "${download_url}" -o cmakeinstall.sh
 	# Supply chain security - CMake
 	hash_url=$(get_github_package_download_url "Kitware/CMake" "endswith(\"SHA-256.txt\")")
-	external_hash=$(get_hash_from_remote_file "$hash_url" "linux-x86_64.sh")
+	external_hash=$(get_hash_from_remote_file "$hash_url" "linux-$ARCH_L.sh")
 	use_checksum_comparison "cmakeinstall.sh" "$external_hash"
 	# Install CMake and remove the install script
 	chmod +x cmakeinstall.sh \
