@@ -14,22 +14,17 @@ REPO_PATH="/etc/apt/sources.list.d/docker.list"
 os_codename=$(lsb_release -cs)
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o $GPG_KEY
-echo "deb [arch=amd64 signed-by=$GPG_KEY] $REPO_URL ${os_codename} stable" > $REPO_PATH
+echo "deb [arch=$ARCH signed-by=$GPG_KEY] $REPO_URL ${os_codename} stable" > $REPO_PATH
 apt-get update
 
-# Install docker components which available via apt-get
-# Using toolsets keep installation order to install dependencies before the package in order to control versions
+# Download docker compose v2 from releases
+URL=$(resolve_github_release_asset_url "docker/compose" "endswith(\"compose-linux-$ARCH_L\")" "latest")
+compose_binary_path=$(download_with_retry "${URL}" "/tmp/docker-compose-v2")
 
-components=$(get_toolset_value '.docker.components[] .package')
-for package in $components; do
-    version=$(get_toolset_value ".docker.components[] | select(.package == \"$package\") | .version")
-    if [[ $version == "latest" ]]; then
-        apt-get install -y --no-install-recommends "$package"
-    else
-        version_string=$(apt-cache madison "$package" | awk '{ print $3 }' | grep "$version" | grep "$os_codename" | head -1)
-        apt-get install -y --no-install-recommends "${package}=${version_string}"
-    fi
-done
+# Supply chain security - Docker Compose v2
+compose_hash_url=$(resolve_github_release_asset_url "docker/compose" "endswith(\"checksums.txt\")" "latest")
+compose_external_hash=$(get_checksum_from_url "${compose_hash_url}" "compose-linux-$ARCH_L" "SHA256")
+use_checksum_comparison "${compose_binary_path}" "${compose_external_hash}"
 
 # Install plugins that are best installed from the GitHub repository
 # Be aware that `url` built from github repo name and plugin name because of current repo naming for those plugins
@@ -80,7 +75,7 @@ fi
 
 # Download amazon-ecr-credential-helper
 aws_latest_release_url="https://api.github.com/repos/awslabs/amazon-ecr-credential-helper/releases/latest"
-aws_helper_url=$(curl -fsSL "${aws_latest_release_url}" | jq -r '.body' | awk -F'[()]' '/linux-amd64/ {print $2}')
+aws_helper_url=$(curl -fsSL "${aws_latest_release_url}" | jq -r '.body' | awk -F'[()]' '/linux-'$ARCH'/ {print $2}')
 aws_helper_binary_path=$(download_with_retry "$aws_helper_url")
 
 # Supply chain security - amazon-ecr-credential-helper
