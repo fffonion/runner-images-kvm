@@ -13,7 +13,7 @@ gpg_key="/usr/share/keyrings/docker.gpg"
 repo_path="/etc/apt/sources.list.d/docker.list"
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o $gpg_key
-echo "deb [arch=amd64 signed-by=$gpg_key] $repo_url $(getOSVersionLabel) stable" > $repo_path
+echo "deb [arch=$ARCH signed-by=$gpg_key] $repo_url $(getOSVersionLabel) stable" > $repo_path
 apt-get update
 apt-get install --no-install-recommends docker-ce docker-ce-cli containerd.io docker-buildx-plugin
 
@@ -53,7 +53,7 @@ fi
 
 # Install amazon-ecr-credential-helper
 aws_latest_release_url="https://api.github.com/repos/awslabs/amazon-ecr-credential-helper/releases/latest"
-aws_helper_url=$(curl "${authString[@]}" -fsSL $aws_latest_release_url | jq -r '.body' | awk -F'[()]' '/linux-amd64/ {print $2}')
+aws_helper_url=$(curl "${authString[@]}" -fsSL $aws_latest_release_url | jq -r '.body' | awk -F'[()]' '/linux-'$ARCH'/ {print $2}')
 download_with_retries "$aws_helper_url" "/usr/bin" docker-credential-ecr-login
 chmod +x /usr/bin/docker-credential-ecr-login
 

@@ -87,3 +87,11 @@ get_github_package_download_url() {
     fi
     echo $downloadUrl
 }
+
+if [[ $(arch) == "aarch64" ]]; then
+        ARCH=arm64
+	ARCH_L=aarch64
+else
+        ARCH=amd64
+	ARCH_L=x86_64
+fi
