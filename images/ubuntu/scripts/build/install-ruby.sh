@@ -47,7 +47,13 @@ for TOOLSET_VERSION in ${TOOLSET_VERSIONS[@]}; do
     echo "Expand '$PACKAGE_TAR_NAME' to the '$RUBY_VERSION_PATH' folder"
     tar xf "$PACKAGE_ARCHIVE_PATH" -C $RUBY_VERSION_PATH
 
-    COMPLETE_FILE_PATH="$RUBY_VERSION_PATH/x64.complete"
+    if [[ $ARCH == "arm64" ]]; then
+	    arch="arm64"
+    else
+	    arch="x64"
+    fi
+
+    COMPLETE_FILE_PATH="$RUBY_VERSION_PATH/$arch.complete"
     if [ ! -f $COMPLETE_FILE_PATH ]; then
         echo "Create complete file"
         touch $COMPLETE_FILE_PATH

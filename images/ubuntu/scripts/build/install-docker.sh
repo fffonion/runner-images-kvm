@@ -14,20 +14,19 @@ gpg_key="/usr/share/keyrings/docker.gpg"
 repo_path="/etc/apt/sources.list.d/docker.list"
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o $gpg_key
-echo "deb [arch=amd64 signed-by=$gpg_key] $repo_url $(getOSVersionLabel) stable" > $repo_path
+echo "deb [arch=$ARCH signed-by=$gpg_key] $repo_url $(getOSVersionLabel) stable" > $repo_path
 apt-get update
 apt-get install --no-install-recommends docker-ce docker-ce-cli containerd.io docker-buildx-plugin
 
 # Download docker compose v2 from releases
-URL=$(resolve_github_release_asset_url "docker/compose" "contains(\"compose-linux-x86_64\")" "latest")
+URL=$(resolve_github_release_asset_url "docker/compose" "contains(\"compose-linux-$ARCH_L\")" "latest")
 curl -fsSL "${URL}" -o /tmp/docker-compose
 # Supply chain security - Docker Compose v2
 compose_hash_url=$(resolve_github_release_asset_url "docker/compose" "contains(\"checksums.txt\")" "latest")
-compose_external_hash=$(get_hash_from_remote_file "${compose_hash_url}" "compose-linux-x86_64")
+compose_external_hash=$(get_hash_from_remote_file "${compose_hash_url}" "compose-linux-$ARCH_L")
 use_checksum_comparison "/tmp/docker-compose" "${compose_external_hash}"
 # Install docker compose v2
 install /tmp/docker-compose /usr/libexec/docker/cli-plugins/docker-compose
-
 
 # docker from official repo introduced different GID generation: https://github.com/actions/runner-images/issues/8157
 gid=$(cut -d ":" -f 3 /etc/group | grep "^1..$" | sort -n | tail -n 1 | awk '{ print $1+1 }')
@@ -65,7 +64,7 @@ fi
 
 # Download amazon-ecr-credential-helper
 aws_latest_release_url="https://api.github.com/repos/awslabs/amazon-ecr-credential-helper/releases/latest"
-aws_helper_url=$(curl "${authString[@]}" -fsSL "${aws_latest_release_url}" | jq -r '.body' | awk -F'[()]' '/linux-amd64/ {print $2}')
+aws_helper_url=$(curl "${authString[@]}" -fsSL "${aws_latest_release_url}" | jq -r '.body' | awk -F'[()]' '/linux-'$ARCH'/ {print $2}')
 aws_helper_binary_path=$(download_with_retry "$aws_helper_url")
 # Supply chain security - amazon-ecr-credential-helper
 aws_helper_external_hash=$(get_hash_from_remote_file "${aws_helper_url}.sha256" "docker-credential-ecr-login")
