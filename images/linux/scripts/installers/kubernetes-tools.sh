@@ -9,7 +9,7 @@
 source $HELPER_SCRIPTS/install.sh
 
 # Install KIND
-URL=$(get_github_package_download_url "kubernetes-sigs/kind" "contains(\"kind-linux-amd64\")")
+URL=$(get_github_package_download_url "kubernetes-sigs/kind" "contains(\"kind-linux-$ARCH\")")
 curl -fsSL -o /usr/local/bin/kind $URL
 chmod +x /usr/local/bin/kind
 
@@ -24,13 +24,13 @@ rm -f /etc/apt/sources.list.d/kubernetes.list
 curl -fsSL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 
 # Install minikube
-curl -fsSL -O https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+curl -fsSL -O https://storage.googleapis.com/minikube/releases/latest/minikube-linux-$ARCH
 
 # Supply chain security - minikube
-minikube_hash=$(get_github_package_hash "kubernetes" "minikube" "linux-amd64" "" "latest" "false" ":" 2)
-use_checksum_comparison "minikube-linux-amd64" "$minikube_hash"
+minikube_hash=$(get_github_package_hash "kubernetes" "minikube" "linux-$ARCH" "" "latest" "false" ":" 2)
+use_checksum_comparison "minikube-linux-$ARCH" "$minikube_hash"
 
-sudo install minikube-linux-amd64 /usr/local/bin/minikube
+sudo install minikube-linux-$ARCH /usr/local/bin/minikube
 
 # Install kustomize
 download_url="https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"

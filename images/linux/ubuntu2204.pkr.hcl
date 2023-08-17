@@ -365,6 +365,7 @@ build {
                         "${path.root}/scripts/installers/nginx.sh",
                         "${path.root}/scripts/installers/nvm.sh",
                         "${path.root}/scripts/installers/nodejs.sh",
+                        "${path.root}/scripts/installers/nodejs-hostedtoolscache.sh",
                         "${path.root}/scripts/installers/bazel.sh",
                         "${path.root}/scripts/installers/oras-cli.sh",
                         "${path.root}/scripts/installers/php.sh",
