@@ -13,17 +13,17 @@ GPG_KEY="/usr/share/keyrings/docker.gpg"
 REPO_PATH="/etc/apt/sources.list.d/docker.list"
 
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o $GPG_KEY
-echo "deb [arch=amd64 signed-by=$GPG_KEY] $REPO_URL $(lsb_release -cs) stable" > $REPO_PATH
+echo "deb [arch=$ARCH signed-by=$GPG_KEY] $REPO_URL $(lsb_release -cs) stable" > $REPO_PATH
 apt-get update
 apt-get install --no-install-recommends docker-ce docker-ce-cli containerd.io docker-buildx-plugin
 
 # Download docker compose v2 from releases
-URL=$(resolve_github_release_asset_url "docker/compose" "endswith(\"compose-linux-x86_64\")" "latest")
+URL=$(resolve_github_release_asset_url "docker/compose" "endswith(\"compose-linux-$ARCH_L\")" "latest")
 compose_binary_path=$(download_with_retry "${URL}" "/tmp/docker-compose-v2")
 
 # Supply chain security - Docker Compose v2
 compose_hash_url=$(resolve_github_release_asset_url "docker/compose" "endswith(\"checksums.txt\")" "latest")
-compose_external_hash=$(get_checksum_from_url "${compose_hash_url}" "compose-linux-x86_64" "SHA256")
+compose_external_hash=$(get_checksum_from_url "${compose_hash_url}" "compose-linux-$ARCH_L" "SHA256")
 use_checksum_comparison "${compose_binary_path}" "${compose_external_hash}"
 
 # Install docker compose v2
@@ -65,7 +65,7 @@ fi
 
 # Download amazon-ecr-credential-helper
 aws_latest_release_url="https://api.github.com/repos/awslabs/amazon-ecr-credential-helper/releases/latest"
-aws_helper_url=$(curl -fsSL "${aws_latest_release_url}" | jq -r '.body' | awk -F'[()]' '/linux-amd64/ {print $2}')
+aws_helper_url=$(curl -fsSL "${aws_latest_release_url}" | jq -r '.body' | awk -F'[()]' '/linux-'$ARCH'/ {print $2}')
 aws_helper_binary_path=$(download_with_retry "$aws_helper_url")
 
 # Supply chain security - amazon-ecr-credential-helper
