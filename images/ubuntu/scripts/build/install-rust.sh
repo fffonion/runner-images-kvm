@@ -19,13 +19,7 @@ source $CARGO_HOME/env
 # Install common tools
 rustup component add rustfmt clippy
 
-if is_ubuntu22; then
-    cargo install bindgen-cli cbindgen cargo-audit cargo-outdated
-fi
-
-if is_ubuntu20; then
-    cargo install bindgen-cli cbindgen cargo-audit cargo-outdated
-fi
+cargo install bindgen-cli cbindgen cargo-audit
 
 # Cleanup Cargo cache
 rm -rf ${CARGO_HOME}/registry/*
