@@ -66,6 +66,7 @@ extract_dotnet_sdk() {
     dest="./tmp-$(basename -s .tar.gz $ARCHIVE_NAME)"
     echo "Extracting $ARCHIVE_NAME to $dest"
     mkdir "$dest" && tar -C "$dest" -xzf "$ARCHIVE_NAME"
+    mkdir -p /usr/share/dotnet
     rsync -qav --remove-source-files "$dest/shared/" /usr/share/dotnet/shared/
     rsync -qav --remove-source-files "$dest/host/" /usr/share/dotnet/host/
     rsync -qav --remove-source-files "$dest/sdk/" /usr/share/dotnet/sdk/
@@ -76,8 +77,15 @@ extract_dotnet_sdk() {
 export -f download_with_retries
 export -f extract_dotnet_sdk
 
+if [[ $ARCH == "amd64" ]]; then
+	arch="x64"
+else
+	arch="arm64"
+fi
+
+
 parallel --jobs 0 --halt soon,fail=1 \
-    'url="https://dotnetcli.blob.core.windows.net/dotnet/Sdk/{}/dotnet-sdk-{}-linux-x64.tar.gz"; \
+    'url="https://dotnetcli.blob.core.windows.net/dotnet/Sdk/{}/dotnet-sdk-{}-linux-'$arch'.tar.gz"; \
     download_with_retries $url' ::: "${sortedSdks[@]}"
 
 find . -name "*.tar.gz" | parallel --halt soon,fail=1 'extract_dotnet_sdk {}'
