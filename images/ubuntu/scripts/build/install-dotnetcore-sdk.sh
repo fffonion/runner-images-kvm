@@ -78,10 +78,10 @@ sorted_sdks=$(echo ${sdks[@]} | tr ' ' '\n' | sort -r | uniq -w 5)
 export -f download_with_retry
 export -f extract_dotnet_sdk
 
-if [[ $ARCH == "amd64" ]]; then
-	arch="x64"
-else
+if [[ $ARCH == "aarch64" ]]; then
 	arch="arm64"
+else
+	arch="x64"
 fi
 
 
