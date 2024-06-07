@@ -46,7 +46,7 @@ echo "Cherry pick from $last_kvm_branch and $last_arm64_branch"
 git checkout $rel
 
 git branch -D ${rel}-kvm 2>/dev/null
-git checkout -b ${rel}-kvm 2>/dev/null
+git checkout --no-track -b ${rel}-kvm 2>/dev/null
 git clean -f
 git pull origin ${rel}-kvm --rebase 2>/dev/null
 for c in $(git log --reverse -n 2 --pretty=format:"%H" $last_kvm_branch); do
@@ -58,7 +58,7 @@ push -f refs/tags/${rel}
 gh release create $rel --notes "https://github.com/actions/runner-images/releases/tag/${rel//\//%2F}"
 
 git branch -D ${rel}-kvm-arm64 2>/dev/null
-git checkout -b ${rel}-kvm-arm64 2>/dev/null
+git checkout --no-track -b ${rel}-kvm-arm64 2>/dev/null
 git clean -f
 git pull origin ${rel}-kvm-arm64 --rebase 2>/dev/null
 # total of 4 commits for arm64
