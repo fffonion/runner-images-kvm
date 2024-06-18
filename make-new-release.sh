@@ -5,6 +5,16 @@ if [[ "$OSTYPE" == darwin* ]]; then
     GREP=ggrep
 fi
 
+urel=${1:-22}
+
+if [[ $urel != "22" && $urel != "24" ]]; then
+    echo "Only support Ubuntu 22.04 and 24.04"
+    exit 1
+fi
+
+echo "Using ${urel}.04"
+
+
 cherry() {
     c=$1
     git cherry-pick $c
@@ -26,11 +36,12 @@ git remote add upstream https://github.com/actions/runner-images 2>/dev/null || 
 git fetch upstream --tags 2>/dev/null || true 
 git fetch origin 2>/dev/null || true
 
-rel=$(gh release list -R actions/runner-images|$GREP -oP "ubuntu24/[\d\.]+"|head -n1)
-last_kvm_branch=origin/$(git branch|grep kvm|grep -v arm64|grep -v $rel|sort|tail -n1|awk '{print $1}')
-last_arm64_branch=origin/$(git branch|grep kvm-arm64|grep -v $rel|sort|tail -n1|awk '{print $1}')
+rel=$(gh release list -R actions/runner-images|$GREP -oP "ubuntu${urel}/[\d\.]+"|head -n1)
+last_kvm_branch=$(git branch -r|grep kvm|grep -v arm64|grep -v $rel|grep ubuntu${urel}|sort|tail -n1|awk '{print $1}')
+last_arm64_branch=$(git branch -r|grep kvm-arm64|grep -v $rel|grep ubuntu${urel}|sort|tail -n1|awk '{print $1}')
 
 echo "The latest upstream release tag is $rel"
+echo "Cherry pick from $last_kvm_branch and $last_arm64_branch"
 
 git checkout $rel
 
@@ -57,7 +68,7 @@ done
 
 # sanity check
 what=0
-for f in $(grep images/ubuntu/scripts/ -rPe "(?:x86_64|amd64)"|cut -d: -f1|sort|uniq); do
+for f in $($GREP images/ubuntu/scripts/ -rPe "(?:x86_64|amd64)"|cut -d: -f1|sort|uniq); do
     ff=$(echo $f|cut -d/ -f3-5)
     fff=$(cat images/ubuntu/templates/ubuntu-22.04.pkr.hcl | grep $ff )
     if [[ ! -z "$fff" && -z $(echo $fff |grep "//") ]]; then
