@@ -1,14 +1,7 @@
 name: JIRA
 
 on:
-  schedule:
-  - cron:  '0 0 * * *'
-  workflow_dispatch:
-     inputs:
-      version:
-        description: 'Manually input a missing release version'
-        required: false
-        type: string
+  pull_request:
 
 jobs:
   check-release-tag:
@@ -38,10 +31,5 @@ jobs:
           echo "Tag exists in current repo"
         else
           echo "Tag does not exist in current repo"
-
-          # deduplication is handled on JIRA automation side
-          curl -s -X POST -H 'Content-type: application/json' \
-            "${{ secrets.JIRA_AUTOMATION_WEBHOOK }}" \
-            -d '{"version":"'$RELEASE_TAG'"}'
         fi
   
